@@ -1,0 +1,90 @@
+services:
+
+  mysql-user:
+    image: mysql:8.4
+    container_name: mysql-user
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_user
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-user-data:/var/lib/mysql
+    networks:
+      - hotelbooking-net
+
+  mysql-room:
+    image: mysql:8.4
+    container_name: mysql-room
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_room
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-room-data:/var/lib/mysql
+    networks:
+      - hotelbooking-net
+
+  mysql-booking:
+    image: mysql:8.4
+    container_name: mysql-booking
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_booking
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-booking-data:/var/lib/mysql
+    networks:
+      - hotelbooking-net
+
+  mysql-payment:
+    image: mysql:8.4
+    container_name: mysql-payment
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_payment
+    ports:
+      - "3310:3306"
+    volumes:
+      - mysql-payment-data:/var/lib/mysql
+    networks:
+      - hotelbooking-net
+
+  mysql-notification:
+    image: mysql:8.4
+    container_name: mysql-notification
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_hotel_notification
+    ports:
+      - "3311:3306"
+    volumes:
+      - mysql-notification-data:/var/lib/mysql
+    networks:
+      - hotelbooking-net
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: keycloak
+    ports:
+      - "8180:8080"
+      - "9000:9000"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    command: start-dev --http-port=8080 --health-enabled=true --metrics-enabled=true
+    networks:
+      - hotelbooking-net
+
+volumes:
+  mysql-user-data:
+  mysql-room-data:
+  mysql-booking-data:
+  mysql-payment-data:
+  mysql-notification-data:
+
+networks:
+  hotelbooking-net:
+    driver: bridge
