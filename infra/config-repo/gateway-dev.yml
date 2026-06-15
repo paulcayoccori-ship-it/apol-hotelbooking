@@ -1,0 +1,94 @@
+# ============================================================
+# gateway — perfil DEV
+# Puerto: 7091 | Rutas lb:// resueltas via Eureka
+# No JWT todavía — todas las rutas son públicas
+# ============================================================
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+
+        # ── Rutas /instancia (sin filtros futuros de autenticación) ────────
+        # Definidas primero para que tengan prioridad sobre las rutas /**
+
+        - id: ms-user-service-instancia
+          uri: lb://ms-user-service
+          predicates:
+            - Path=/api/v1/users/instancia
+
+        - id: ms-room-service-instancia
+          uri: lb://ms-room-service
+          predicates:
+            - Path=/api/v1/rooms/instancia
+
+        - id: ms-booking-service-instancia
+          uri: lb://ms-booking-service
+          predicates:
+            - Path=/api/v1/bookings/instancia
+
+        - id: ms-payment-service-instancia
+          uri: lb://ms-payment-service
+          predicates:
+            - Path=/api/v1/payments/instancia
+
+        - id: ms-notification-service-instancia
+          uri: lb://ms-notification-service
+          predicates:
+            - Path=/api/v1/notifications/instancia
+
+        # ── Rutas generales ────────────────────────────────────────────────
+
+        - id: ms-user-service
+          uri: lb://ms-user-service
+          predicates:
+            - Path=/api/v1/users/**
+
+        - id: ms-room-service
+          uri: lb://ms-room-service
+          predicates:
+            - Path=/api/v1/rooms/**
+
+        - id: ms-booking-service
+          uri: lb://ms-booking-service
+          predicates:
+            - Path=/api/v1/bookings/**
+
+        - id: ms-payment-service
+          uri: lb://ms-payment-service
+          predicates:
+            - Path=/api/v1/payments/**
+
+        - id: ms-notification-service
+          uri: lb://ms-notification-service
+          predicates:
+            - Path=/api/v1/notifications/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:7081/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: INFO

@@ -1,0 +1,29 @@
+server:
+  port: 7071
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # Dev: ../config-repo (relativo al working dir al correr con mvn)
+          # Docker: se sobreescribe con CONFIG_REPO_PATH=/config-repo
+          search-locations: file:${CONFIG_REPO_PATH:../config-repo}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,refresh
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.config: DEBUG

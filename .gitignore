@@ -1,0 +1,41 @@
+# ─── Maven ───────────────────────────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ─── IDE ─────────────────────────────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.code-workspace
+
+# ─── Spring Boot ─────────────────────────────────────────────
+*.jar
+*.war
+*.ear
+*.nar
+
+# ─── Logs ────────────────────────────────────────────────────
+*.log
+logs/
+spring.log
+
+# ─── Entornos locales ────────────────────────────────────────
+.env
+.env.local
+*.env
+
+# ─── OS ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Config Server — repo de configuración (se versiona aparte si se desea)
+# Descomenta la siguiente línea si prefieres excluir los YMLs de config-repo
+# infra/config-repo/
+
+# ─── Docker ──────────────────────────────────────────────────
+# docker-compose.override.yml
