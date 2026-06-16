@@ -1,0 +1,33 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-icon">&#127968;</span>
+    <span class="brand-name">HotelBooking</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <span class="icon">&#128202;</span> Dashboard
+    </a>
+    <a routerLink="/users" routerLinkActive="active" class="nav-item">
+      <span class="icon">&#128101;</span> Usuarios
+    </a>
+    <a routerLink="/rooms" routerLinkActive="active" class="nav-item">
+      <span class="icon">&#128716;</span> Habitaciones
+    </a>
+    <a routerLink="/bookings" routerLinkActive="active" class="nav-item">
+      <span class="icon">&#128197;</span> Reservas
+    </a>
+    <a routerLink="/payments" routerLinkActive="active" class="nav-item">
+      <span class="icon">&#128179;</span> Pagos
+    </a>
+    <a routerLink="/notifications" routerLinkActive="active" class="nav-item">
+      <span class="icon">&#128276;</span> Notificaciones
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <span class="icon">&#128682;</span> Salir
+    </button>
+  </div>
+</aside>

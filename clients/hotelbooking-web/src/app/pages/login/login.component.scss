@@ -1,0 +1,133 @@
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary) 0%, #2c5282 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.login-logo {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+
+.login-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: inherit;
+    transition: border-color 0.18s;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    &::placeholder {
+      color: #aaa;
+      font-size: 13px;
+    }
+  }
+
+  small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-light);
+  }
+}
+
+.btn-login {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+  margin-top: 4px;
+
+  &:hover:not(:disabled) {
+    background: #219a52;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.login-info {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+
+  p {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+
+  code {
+    background: #f4f6f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--primary);
+  }
+}
+
+.alert-danger {
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  text-align: left;
+}

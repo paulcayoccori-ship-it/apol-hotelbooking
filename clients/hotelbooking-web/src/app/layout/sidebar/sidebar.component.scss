@@ -1,0 +1,95 @@
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: var(--primary);
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-brand {
+  padding: 22px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .brand-icon {
+    font-size: 26px;
+  }
+
+  .brand-name {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 20px;
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.18s;
+    border-left: 3px solid transparent;
+
+    .icon {
+      font-size: 17px;
+      width: 22px;
+      text-align: center;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-left-color: var(--accent);
+    }
+  }
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.18s;
+
+    .icon {
+      font-size: 17px;
+    }
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}

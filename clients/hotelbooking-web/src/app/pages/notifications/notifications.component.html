@@ -1,0 +1,93 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Notificaciones</h2>
+      <p class="page-subtitle">Gestión de notificaciones del sistema</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ Nueva notificación</button>
+  </div>
+
+  @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+  @if (success) { <div class="alert alert-success">{{ success }}</div> }
+
+  <div class="card">
+    @if (loading) {
+      <div class="loading">Cargando notificaciones...</div>
+    } @else if (notifications.length === 0) {
+      <div class="empty">No hay notificaciones registradas.</div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th><th>Usuario</th><th>Tipo</th><th>Canal</th>
+            <th>Asunto</th><th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (n of notifications; track n.id) {
+            <tr>
+              <td>#{{ n.id }}</td>
+              <td>{{ n.userId }}</td>
+              <td>{{ n.type }}</td>
+              <td>{{ n.channel }}</td>
+              <td>{{ n.subject }}</td>
+              <td><span class="badge" [class]="'badge-' + n.status?.toLowerCase()">{{ n.status }}</span></td>
+              <td class="actions">
+                @if (n.status !== 'SENT') {
+                  <button class="btn btn-sm btn-success" (click)="send(n.id!)">Enviar</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal-overlay" (click)="showModal = false">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Nueva Notificación</h3>
+        <button class="close-btn" (click)="showModal = false">&#x2715;</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>ID Usuario *</label>
+            <input type="number" formControlName="userId" placeholder="ID del usuario" />
+          </div>
+          <div class="form-group">
+            <label>ID Reserva</label>
+            <input type="number" formControlName="bookingId" placeholder="Opcional" />
+          </div>
+          <div class="form-group">
+            <label>Tipo *</label>
+            <select formControlName="type">
+              @for (t of types; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Canal *</label>
+            <select formControlName="channel">
+              @for (c of channels; track c) { <option [value]="c">{{ c }}</option> }
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Asunto *</label>
+            <input type="text" formControlName="subject" placeholder="Asunto del mensaje" />
+          </div>
+          <div class="form-group full">
+            <label>Mensaje *</label>
+            <textarea formControlName="message" rows="3" placeholder="Contenido del mensaje"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showModal = false">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Crear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

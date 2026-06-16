@@ -1,0 +1,92 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Habitaciones</h2>
+      <p class="page-subtitle">Gestión de habitaciones del hotel</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ Nueva habitación</button>
+  </div>
+
+  @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+  @if (success) { <div class="alert alert-success">{{ success }}</div> }
+
+  <div class="card">
+    @if (loading) {
+      <div class="loading">Cargando habitaciones...</div>
+    } @else if (rooms.length === 0) {
+      <div class="empty">No hay habitaciones registradas.</div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>N° Habitación</th><th>Tipo</th><th>Descripción</th>
+            <th>Precio/Noche</th><th>Capacidad</th><th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of rooms; track r.id) {
+            <tr>
+              <td><strong>{{ r.roomNumber }}</strong></td>
+              <td>{{ r.type }}</td>
+              <td>{{ r.description || '—' }}</td>
+              <td>S/ {{ r.pricePerNight | number:'1.2-2' }}</td>
+              <td>{{ r.capacity }}</td>
+              <td><span class="badge" [class]="'badge-' + r.status?.toLowerCase()">{{ r.status }}</span></td>
+              <td class="actions">
+                <button class="btn btn-sm btn-secondary" (click)="openEdit(r)">Editar</button>
+                <button class="btn btn-sm btn-danger" (click)="delete(r.id!)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editMode ? 'Editar' : 'Nueva' }} Habitación</h3>
+        <button class="close-btn" (click)="closeModal()">&#x2715;</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>N° Habitación *</label>
+            <input type="text" formControlName="roomNumber" placeholder="Ej: 101" />
+          </div>
+          <div class="form-group">
+            <label>Tipo *</label>
+            <select formControlName="type">
+              @for (t of roomTypes; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Precio por Noche *</label>
+            <input type="number" formControlName="pricePerNight" placeholder="0.00" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Capacidad *</label>
+            <input type="number" formControlName="capacity" placeholder="1" min="1" />
+          </div>
+          <div class="form-group full">
+            <label>Descripción</label>
+            <input type="text" formControlName="description" placeholder="Descripción de la habitación" />
+          </div>
+          <div class="form-group">
+            <label>Estado *</label>
+            <select formControlName="status">
+              @for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

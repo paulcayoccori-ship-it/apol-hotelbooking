@@ -1,0 +1,84 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Pagos</h2>
+      <p class="page-subtitle">Gestión de pagos y transacciones</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ Registrar pago</button>
+  </div>
+
+  @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+  @if (success) { <div class="alert alert-success">{{ success }}</div> }
+
+  <div class="card">
+    @if (loading) {
+      <div class="loading">Cargando pagos...</div>
+    } @else if (payments.length === 0) {
+      <div class="empty">No hay pagos registrados.</div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th><th>Reserva</th><th>Monto</th><th>Método</th>
+            <th>Código Transacción</th><th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of payments; track p.id) {
+            <tr>
+              <td>#{{ p.id }}</td>
+              <td>#{{ p.bookingId }}</td>
+              <td>S/ {{ p.amount | number:'1.2-2' }}</td>
+              <td>{{ p.paymentMethod }}</td>
+              <td>{{ p.transactionCode || '—' }}</td>
+              <td><span class="badge" [class]="'badge-' + p.status?.toLowerCase()">{{ p.status }}</span></td>
+              <td class="actions">
+                @if (p.status === 'PENDING') {
+                  <button class="btn btn-sm btn-success" (click)="confirm(p.id!)">Confirmar</button>
+                  <button class="btn btn-sm btn-danger" (click)="fail(p.id!)">Fallido</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+@if (showModal) {
+  <div class="modal-overlay" (click)="showModal = false">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Registrar Pago</h3>
+        <button class="close-btn" (click)="showModal = false">&#x2715;</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>ID Reserva *</label>
+            <input type="number" formControlName="bookingId" placeholder="ID de la reserva" />
+          </div>
+          <div class="form-group">
+            <label>Monto (S/) *</label>
+            <input type="number" formControlName="amount" placeholder="0.00" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Método de Pago *</label>
+            <select formControlName="paymentMethod">
+              @for (m of methods; track m) { <option [value]="m">{{ m }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Código de Transacción</label>
+            <input type="text" formControlName="transactionCode" placeholder="Opcional" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="showModal = false">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
