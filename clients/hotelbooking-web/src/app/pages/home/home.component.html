@@ -1,0 +1,104 @@
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Reserva tu habitación ideal</h1>
+    <p>HotelBooking te permite encontrar habitaciones disponibles, promociones y reservar en línea.</p>
+    <div class="hero-buttons">
+      <a routerLink="/rooms" class="btn-hero-primary">Ver habitaciones</a>
+      <a routerLink="/promotions" class="btn-hero-secondary">Ver promociones</a>
+    </div>
+  </div>
+</section>
+
+<!-- Habitaciones destacadas -->
+<section class="section">
+  <div class="section-header">
+    <h2>Habitaciones Disponibles</h2>
+    <a routerLink="/rooms" class="link-more">Ver todas →</a>
+  </div>
+  @if (loading) {
+    <p class="loading-text">Cargando habitaciones...</p>
+  } @else if (available.length === 0) {
+    <p class="empty-text">No hay habitaciones disponibles en este momento.</p>
+  } @else {
+    <div class="cards-grid">
+      @for (r of available; track r.id) {
+        <div class="room-card">
+          @if (r.imageUrl) {
+            <img [src]="r.imageUrl" alt="{{ r.type }}" class="room-card-img" />
+          } @else {
+            <div class="room-card-no-img">&#127968;</div>
+          }
+          <div class="room-card-body">
+            <span class="room-type-badge">{{ r.type }}</span>
+            <h3>Hab. {{ r.roomNumber }}</h3>
+            <p class="room-desc">{{ r.description || 'Habitación cómoda y bien equipada.' }}</p>
+            <div class="room-meta">
+              <span>&#128100; {{ r.capacity }} personas</span>
+              <span class="room-price">S/ {{ r.pricePerNight | number:'1.2-2' }} / noche</span>
+            </div>
+            <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar</a>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>
+
+<!-- Promociones -->
+@if (promotions.length > 0) {
+  <section class="section section-promo">
+    <div class="section-header">
+      <h2>&#127881; Promociones Especiales</h2>
+      <a routerLink="/promotions" class="link-more">Ver todas →</a>
+    </div>
+    <div class="cards-grid">
+      @for (r of promotions; track r.id) {
+        <div class="promo-card">
+          @if (r.imageUrl) {
+            <img [src]="r.imageUrl" alt="{{ r.type }}" class="room-card-img" />
+          } @else {
+            <div class="room-card-no-img">&#127881;</div>
+          }
+          <div class="promo-badge">{{ r.discountPercent }}% OFF</div>
+          <div class="room-card-body">
+            <h3>{{ r.promotionTitle }}</h3>
+            <p class="room-desc">{{ r.promotionDescription }}</p>
+            <div class="promo-prices">
+              <span class="price-old">S/ {{ r.pricePerNight | number:'1.2-2' }}</span>
+              <span class="price-new">S/ {{ r.promotionPrice | number:'1.2-2' }}</span>
+            </div>
+            <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar ahora</a>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+}
+
+<!-- Beneficios -->
+<section class="section section-benefits">
+  <h2>¿Por qué elegirnos?</h2>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <span class="benefit-icon">&#9889;</span>
+      <h4>Reserva rápida</h4>
+      <p>En segundos, sin papeleos ni esperas.</p>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">&#128274;</span>
+      <h4>Pago seguro</h4>
+      <p>YAPE, PLIN, tarjeta o efectivo.</p>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">&#127775;</span>
+      <h4>Habitaciones cómodas</h4>
+      <p>Equipadas para tu descanso total.</p>
+    </div>
+    <div class="benefit-card">
+      <span class="benefit-icon">&#128222;</span>
+      <h4>Atención 24/7</h4>
+      <p>Siempre disponibles para ayudarte.</p>
+    </div>
+  </div>
+</section>

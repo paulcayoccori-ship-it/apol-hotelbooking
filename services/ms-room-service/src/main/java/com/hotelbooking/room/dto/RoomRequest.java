@@ -35,4 +35,11 @@ public class RoomRequest {
 
     @NotNull(message = "Status is required")
     private RoomStatus status;
+
+    private String imageUrl;
+    private Boolean promotionActive;
+    private String promotionTitle;
+    private String promotionDescription;
+    private BigDecimal discountPercent;
+    private BigDecimal promotionPrice;
 }

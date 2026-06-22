@@ -55,6 +55,12 @@ public class RoomServiceImpl implements RoomService {
         room.setPricePerNight(request.getPricePerNight());
         room.setCapacity(request.getCapacity());
         room.setStatus(request.getStatus());
+        room.setImageUrl(request.getImageUrl());
+        room.setPromotionActive(request.getPromotionActive() != null ? request.getPromotionActive() : false);
+        room.setPromotionTitle(request.getPromotionTitle());
+        room.setPromotionDescription(request.getPromotionDescription());
+        room.setDiscountPercent(request.getDiscountPercent());
+        room.setPromotionPrice(request.getPromotionPrice());
 
         return toResponse(roomRepository.save(room));
     }
@@ -88,6 +94,12 @@ public class RoomServiceImpl implements RoomService {
                 .pricePerNight(room.getPricePerNight())
                 .capacity(room.getCapacity())
                 .status(room.getStatus())
+                .imageUrl(room.getImageUrl())
+                .promotionActive(room.getPromotionActive())
+                .promotionTitle(room.getPromotionTitle())
+                .promotionDescription(room.getPromotionDescription())
+                .discountPercent(room.getDiscountPercent())
+                .promotionPrice(room.getPromotionPrice())
                 .build();
     }
 
@@ -99,6 +111,12 @@ public class RoomServiceImpl implements RoomService {
                 .pricePerNight(request.getPricePerNight())
                 .capacity(request.getCapacity())
                 .status(request.getStatus())
+                .imageUrl(request.getImageUrl())
+                .promotionActive(request.getPromotionActive() != null ? request.getPromotionActive() : false)
+                .promotionTitle(request.getPromotionTitle())
+                .promotionDescription(request.getPromotionDescription())
+                .discountPercent(request.getDiscountPercent())
+                .promotionPrice(request.getPromotionPrice())
                 .build();
     }
 }

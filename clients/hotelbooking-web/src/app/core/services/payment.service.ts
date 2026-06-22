@@ -18,6 +18,10 @@ export class PaymentService {
     return this.http.post<Payment>(this.url, payment);
   }
 
+  getById(id: number): Observable<Payment> {
+    return this.http.get<Payment>(`${this.url}/${id}`);
+  }
+
   confirm(id: number): Observable<Payment> {
     return this.http.patch<Payment>(`${this.url}/${id}/confirm`, {});
   }

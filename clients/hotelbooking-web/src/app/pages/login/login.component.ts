@@ -1,38 +1,47 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  error = '';
+  error   = '';
+  loading = false;
 
   form = new FormGroup({
-    userName: new FormControl('', Validators.required),
-    token: new FormControl('', Validators.required)
+    username: new FormControl('', Validators.required),
+    password: new FormControl('', Validators.required)
   });
 
   constructor(private auth: AuthService, private router: Router) {
     if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/admin/dashboard']);
     }
   }
 
   login(): void {
     if (this.form.invalid) return;
-    const { userName, token } = this.form.value;
-    if (!token?.trim()) {
-      this.error = 'Ingresa un token JWT válido.';
-      return;
-    }
-    this.auth.saveToken(token.trim());
-    this.auth.saveUserName(userName || 'Administrador');
-    this.router.navigate(['/dashboard']);
+    this.error   = '';
+    this.loading = true;
+
+    const { username, password } = this.form.value;
+
+    this.auth.login(username!, password!).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: () => {
+        this.loading = false;
+        this.error   = 'Usuario o contraseña incorrectos.';
+      }
+    });
   }
 }

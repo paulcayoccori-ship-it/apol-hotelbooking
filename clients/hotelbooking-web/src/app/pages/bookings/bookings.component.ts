@@ -3,6 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { BookingService } from '../../core/services/booking.service';
 import { Booking } from '../../core/models/booking.model';
+import { apiErrMsg } from '../../core/utils/api-error.util';
 
 @Component({
   selector: 'app-bookings',
@@ -88,12 +89,7 @@ export class BookingsComponent implements OnInit {
 
   closeModal(): void { this.showModal = false; }
 
-  errMsg(e: any): string {
-    if (!e.status) return 'No se pudo conectar con el servidor.';
-    if (e.status === 403) return 'No tiene permisos.';
-    if (e.status === 500) return 'Error interno del servidor.';
-    return e.error?.message || 'Error inesperado.';
-  }
+  errMsg(e: any): string { return apiErrMsg(e); }
 
   autoClear(): void { setTimeout(() => { this.success = ''; this.error = ''; }, 3500); }
 

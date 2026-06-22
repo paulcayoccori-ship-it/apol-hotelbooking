@@ -14,6 +14,10 @@ export class BookingService {
     return this.http.get<Booking[]>(this.url);
   }
 
+  getById(id: number): Observable<Booking> {
+    return this.http.get<Booking>(`${this.url}/${id}`);
+  }
+
   create(booking: Booking): Observable<Booking> {
     return this.http.post<Booking>(this.url, booking);
   }

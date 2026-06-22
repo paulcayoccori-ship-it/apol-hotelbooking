@@ -10,25 +10,22 @@
 
     <form [formGroup]="form" (ngSubmit)="login()">
       <div class="form-group">
-        <label>Nombre de usuario</label>
-        <input type="text" formControlName="userName" placeholder="Ej: Administrador" />
+        <label>Usuario</label>
+        <input type="text" formControlName="username" placeholder="Ej: admin" autocomplete="username" />
       </div>
 
       <div class="form-group">
-        <label>Token JWT</label>
-        <textarea formControlName="token" rows="5"
-          placeholder="Pega aquí tu token de acceso obtenido desde Keycloak (http://localhost:8180)">
-        </textarea>
-        <small>Obtén tu token desde Keycloak → Realm: <strong>hotelbooking</strong></small>
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
       </div>
 
-      <button type="submit" class="btn-login" [disabled]="form.invalid">
-        Ingresar al sistema
+      <button type="submit" class="btn-login" [disabled]="form.invalid || loading">
+        @if (loading) { Ingresando... } @else { Ingresar al sistema }
       </button>
     </form>
 
     <div class="login-info">
-      <p>&#128274; Las rutas están protegidas por Keycloak</p>
+      <p>&#128274; Autenticación via Keycloak — Realm: <strong>hotelbooking</strong></p>
       <p>Keycloak: <code>http://localhost:8180</code></p>
     </div>
   </div>

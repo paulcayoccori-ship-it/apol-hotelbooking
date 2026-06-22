@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
 import { User } from '../../core/models/user.model';
+import { apiErrMsg } from '../../core/utils/api-error.util';
 
 @Component({
   selector: 'app-users',
@@ -72,12 +73,7 @@ export class UsersComponent implements OnInit {
 
   closeModal(): void { this.showModal = false; }
 
-  errMsg(e: any): string {
-    if (!e.status) return 'No se pudo conectar con el servidor.';
-    if (e.status === 403) return 'No tiene permisos para esta acción.';
-    if (e.status === 500) return 'Error interno del servidor.';
-    return e.error?.message || 'Error inesperado.';
-  }
+  errMsg(e: any): string { return apiErrMsg(e); }
 
   autoClear(): void { setTimeout(() => { this.success = ''; this.error = ''; }, 3500); }
 

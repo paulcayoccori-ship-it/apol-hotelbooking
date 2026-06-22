@@ -6,4 +6,10 @@ export interface Room {
   pricePerNight: number;
   capacity: number;
   status: string;
+  imageUrl?: string;
+  promotionActive?: boolean;
+  promotionTitle?: string;
+  promotionDescription?: string;
+  discountPercent?: number;
+  promotionPrice?: number;
 }

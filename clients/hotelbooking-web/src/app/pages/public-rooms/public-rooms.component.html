@@ -1,0 +1,65 @@
+<div class="pub-page">
+  <div class="pub-page-header">
+    <h1>Habitaciones</h1>
+    <p>Encuentra la habitación perfecta para tu estadía</p>
+  </div>
+
+  <div class="filters-bar">
+    <select [(ngModel)]="filterType" (change)="applyFilters()">
+      <option value="">Todos los tipos</option>
+      @for (t of roomTypes; track t) {
+        @if (t) { <option [value]="t">{{ t }}</option> }
+      }
+    </select>
+    <select [(ngModel)]="filterStatus" (change)="applyFilters()">
+      <option value="">Todos los estados</option>
+      <option value="AVAILABLE">Disponibles</option>
+      <option value="OCCUPIED">Ocupadas</option>
+    </select>
+  </div>
+
+  @if (error)   { <div class="alert-pub">{{ error }}</div> }
+  @if (loading) { <div class="loading-pub">Cargando habitaciones...</div> }
+
+  <div class="cards-grid">
+    @for (r of filtered; track r.id) {
+      <div class="room-card">
+        @if (r.imageUrl) {
+          <img [src]="r.imageUrl" alt="{{ r.type }}" class="room-card-img" />
+        } @else {
+          <div class="room-card-no-img">&#127968;</div>
+        }
+        <div class="room-card-body">
+          @if (r.promotionActive) {
+            <span class="promo-tag">{{ r.discountPercent }}% OFF</span>
+          }
+          <span class="room-type-badge">{{ r.type }}</span>
+          <h3>Hab. {{ r.roomNumber }}</h3>
+          <p class="room-desc">{{ r.description || 'Habitación cómoda y bien equipada.' }}</p>
+          <div class="room-meta">
+            <span>&#128100; {{ r.capacity }} personas</span>
+            <span class="status-dot" [class.available]="r.status === 'AVAILABLE'">
+              {{ r.status === 'AVAILABLE' ? 'Disponible' : r.status }}
+            </span>
+          </div>
+          <div class="room-price-row">
+            @if (r.promotionActive && r.promotionPrice) {
+              <span class="price-old">S/ {{ r.pricePerNight | number:'1.2-2' }}</span>
+              <span class="price-new">S/ {{ r.promotionPrice | number:'1.2-2' }}</span>
+            } @else {
+              <span class="room-price">S/ {{ r.pricePerNight | number:'1.2-2' }} / noche</span>
+            }
+          </div>
+          @if (r.status === 'AVAILABLE') {
+            <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar</a>
+          } @else {
+            <button class="btn-reservar disabled" disabled>No disponible</button>
+          }
+        </div>
+      </div>
+    }
+    @if (!loading && filtered.length === 0) {
+      <p class="empty-pub">No se encontraron habitaciones con los filtros aplicados.</p>
+    }
+  </div>
+</div>

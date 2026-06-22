@@ -1,0 +1,49 @@
+<div class="pub-page">
+  <div class="pub-page-header">
+    <h1>&#127881; Promociones Especiales</h1>
+    <p>Aprovecha nuestras ofertas exclusivas por tiempo limitado</p>
+  </div>
+
+  @if (error)   { <div class="alert-pub">{{ error }}</div> }
+  @if (loading) { <div class="loading-pub">Cargando promociones...</div> }
+
+  @if (!loading && promotions.length === 0) {
+    <div class="empty-pub-center">
+      <p>&#128533; No hay promociones activas en este momento.</p>
+      <a routerLink="/rooms" class="btn-reservar">Ver habitaciones disponibles</a>
+    </div>
+  }
+
+  <div class="cards-grid">
+    @for (r of promotions; track r.id) {
+      <div class="promo-card">
+        @if (r.imageUrl) {
+          <img [src]="r.imageUrl" alt="{{ r.type }}" class="room-card-img" />
+        } @else {
+          <div class="room-card-no-img">&#127881;</div>
+        }
+        <div class="promo-badge-large">{{ r.discountPercent }}% OFF</div>
+        <div class="room-card-body">
+          <h3>{{ r.promotionTitle }}</h3>
+          <p class="room-desc">{{ r.promotionDescription }}</p>
+          <div class="room-meta">
+            <span class="room-type-badge">{{ r.type }}</span>
+            <span>&#128100; {{ r.capacity }} personas</span>
+          </div>
+          <div class="promo-prices">
+            <span class="price-label">Precio normal:</span>
+            <span class="price-old">S/ {{ r.pricePerNight | number:'1.2-2' }}</span>
+          </div>
+          <div class="promo-prices highlight">
+            <span class="price-label">Precio promocional:</span>
+            <span class="price-new">S/ {{ r.promotionPrice | number:'1.2-2' }}</span>
+          </div>
+          <p class="promo-saving">
+            Ahorras S/ {{ (r.pricePerNight - (r.promotionPrice ?? 0)) | number:'1.2-2' }} por noche
+          </p>
+          <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar ahora</a>
+        </div>
+      </div>
+    }
+  </div>
+</div>

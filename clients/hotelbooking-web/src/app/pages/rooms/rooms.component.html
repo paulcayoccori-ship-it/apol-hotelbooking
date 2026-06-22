@@ -7,7 +7,7 @@
     <button class="btn btn-primary" (click)="openCreate()">+ Nueva habitación</button>
   </div>
 
-  @if (error) { <div class="alert alert-danger">{{ error }}</div> }
+  @if (error)   { <div class="alert alert-danger">{{ error }}</div> }
   @if (success) { <div class="alert alert-success">{{ success }}</div> }
 
   <div class="card">
@@ -19,22 +19,37 @@
       <table class="table">
         <thead>
           <tr>
-            <th>N° Habitación</th><th>Tipo</th><th>Descripción</th>
-            <th>Precio/Noche</th><th>Capacidad</th><th>Estado</th><th>Acciones</th>
+            <th>Foto</th><th>N°</th><th>Tipo</th><th>Descripción</th>
+            <th>Precio/Noche</th><th>Capacidad</th><th>Estado</th><th>Promo</th><th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           @for (r of rooms; track r.id) {
             <tr>
+              <td>
+                @if (r.imageUrl) {
+                  <img [src]="r.imageUrl" alt="Habitación" class="room-thumb" />
+                } @else {
+                  <span class="no-img">Sin foto</span>
+                }
+              </td>
               <td><strong>{{ r.roomNumber }}</strong></td>
               <td>{{ r.type }}</td>
               <td>{{ r.description || '—' }}</td>
               <td>S/ {{ r.pricePerNight | number:'1.2-2' }}</td>
               <td>{{ r.capacity }}</td>
-              <td><span class="badge" [class]="'badge-' + r.status?.toLowerCase()">{{ r.status }}</span></td>
+              <td><span class="badge" [ngClass]="statusClass(r.status)">{{ r.status }}</span></td>
+              <td>
+                @if (r.promotionActive) {
+                  <span class="badge badge-promo">{{ r.discountPercent }}% OFF</span>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
               <td class="actions">
                 <button class="btn btn-sm btn-secondary" (click)="openEdit(r)">Editar</button>
-                <button class="btn btn-sm btn-danger" (click)="delete(r.id!)">Eliminar</button>
+                <button class="btn btn-sm btn-promo"    (click)="openPromo(r)">Promo</button>
+                <button class="btn btn-sm btn-danger"   (click)="delete(r.id!)">Eliminar</button>
               </td>
             </tr>
           }
@@ -44,6 +59,7 @@
   </div>
 </div>
 
+<!-- Modal Habitación -->
 @if (showModal) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-box" (click)="$event.stopPropagation()">
@@ -81,10 +97,59 @@
               @for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }
             </select>
           </div>
+          <div class="form-group full">
+            <label>Foto de la Habitación</label>
+            <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+            @if (imagePreview) {
+              <img [src]="imagePreview" alt="Vista previa" class="img-preview" />
+            }
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
           <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Promoción -->
+@if (showPromoModal) {
+  <div class="modal-overlay" (click)="closePromoModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>&#127881; Gestionar Promoción</h3>
+        <button class="close-btn" (click)="closePromoModal()">&#x2715;</button>
+      </div>
+      <form [formGroup]="promoForm" (ngSubmit)="savePromo()">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>
+              <input type="checkbox" formControlName="promotionActive" />
+              Promoción activa
+            </label>
+          </div>
+          <div class="form-group full">
+            <label>Título de promoción *</label>
+            <input type="text" formControlName="promotionTitle" placeholder="Ej: Oferta de verano" />
+          </div>
+          <div class="form-group full">
+            <label>Descripción</label>
+            <input type="text" formControlName="promotionDescription" placeholder="Descripción de la promoción" />
+          </div>
+          <div class="form-group">
+            <label>Descuento (%) *</label>
+            <input type="number" formControlName="discountPercent" min="0" max="100" placeholder="0" />
+          </div>
+          <div class="form-group">
+            <label>Precio promocional (S/) *</label>
+            <input type="number" formControlName="promotionPrice" min="0" placeholder="0.00" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closePromoModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="promoForm.invalid">Guardar Promoción</button>
         </div>
       </form>
     </div>

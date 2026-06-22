@@ -1,0 +1,101 @@
+<div class="pub-page booking-page">
+  <div class="pub-page-header">
+    <h1>Confirmar Pago</h1>
+  </div>
+
+  @if (error)   { <div class="alert-pub">{{ error }}</div> }
+  @if (loading) { <div class="loading-pub">Cargando reserva...</div> }
+
+  <!-- Pantalla de éxito -->
+  @if (done && payment) {
+    <div class="success-card">
+      <div class="success-icon">&#10003;</div>
+      <h2>¡Reserva pagada correctamente!</h2>
+      <div class="summary-table">
+        <div class="summary-row">
+          <span>N° Reserva</span>
+          <strong>#{{ booking?.id }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Check-in</span>
+          <strong>{{ booking?.checkInDate }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Check-out</span>
+          <strong>{{ booking?.checkOutDate }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Monto pagado</span>
+          <strong>S/ {{ payment.amount | number:'1.2-2' }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Método de pago</span>
+          <strong>{{ payment.paymentMethod }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Estado</span>
+          <strong class="text-success">{{ payment.status }}</strong>
+        </div>
+      </div>
+      <a routerLink="/" class="btn-reservar">Volver al inicio</a>
+    </div>
+  }
+
+  <!-- Formulario de pago -->
+  @if (!done && booking && !loading) {
+    <div class="booking-layout">
+      <div class="booking-summary-card">
+        <h3>Resumen de Reserva</h3>
+        <div class="summary-table">
+          <div class="summary-row">
+            <span>N° Reserva</span>
+            <strong>#{{ booking.id }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Check-in</span>
+            <strong>{{ booking.checkInDate }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Check-out</span>
+            <strong>{{ booking.checkOutDate }}</strong>
+          </div>
+          <div class="summary-row total-row">
+            <span>Total a pagar</span>
+            <strong>S/ {{ booking.totalAmount | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-form-card">
+        <h2>Datos de Pago</h2>
+        <form [formGroup]="form" (ngSubmit)="pay()">
+          <div class="form-group">
+            <label>Método de pago *</label>
+            <div class="method-grid">
+              @for (m of methods; track m) {
+                <label class="method-option" [class.selected]="form.value.paymentMethod === m">
+                  <input type="radio" formControlName="paymentMethod" [value]="m" />
+                  {{ m }}
+                </label>
+              }
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Monto (S/) *</label>
+            <input type="number" formControlName="amount" min="1" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Código de operación</label>
+            <input type="text" formControlName="transactionCode" placeholder="Ej: OP-123456 (opcional)" />
+          </div>
+          <div class="booking-actions">
+            <a routerLink="/rooms" class="btn-secondary-pub">&#8592; Cancelar</a>
+            <button type="submit" class="btn-reservar" [disabled]="form.invalid || saving">
+              @if (saving) { Procesando... } @else { Confirmar pago }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

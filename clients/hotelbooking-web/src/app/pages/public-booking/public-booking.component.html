@@ -1,0 +1,81 @@
+<div class="pub-page booking-page">
+  <div class="pub-page-header">
+    <h1>Reservar Habitación</h1>
+  </div>
+
+  @if (error)   { <div class="alert-pub">{{ error }}</div> }
+  @if (loading) { <div class="loading-pub">Cargando habitación...</div> }
+
+  @if (room && !loading) {
+    <div class="booking-layout">
+
+      <!-- Resumen habitación -->
+      <div class="booking-summary-card">
+        @if (room.imageUrl) {
+          <img [src]="room.imageUrl" alt="Habitación" class="booking-room-img" />
+        } @else {
+          <div class="room-card-no-img">&#127968;</div>
+        }
+        <div class="booking-room-info">
+          <h3>Habitación {{ room.roomNumber }}</h3>
+          <p class="room-type-badge">{{ room.type }}</p>
+          <p>{{ room.description }}</p>
+          <p>&#128100; Capacidad: {{ room.capacity }} personas</p>
+          @if (room.promotionActive && room.promotionPrice) {
+            <div class="promo-prices">
+              <span class="price-old">S/ {{ room.pricePerNight | number:'1.2-2' }} / noche</span>
+              <span class="price-new">S/ {{ room.promotionPrice | number:'1.2-2' }} / noche</span>
+            </div>
+          } @else {
+            <p class="room-price">S/ {{ room.pricePerNight | number:'1.2-2' }} / noche</p>
+          }
+          @if (estimatedTotal > 0) {
+            <div class="total-estimado">
+              <strong>Total estimado: S/ {{ estimatedTotal | number:'1.2-2' }}</strong>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Formulario reserva -->
+      <div class="booking-form-card">
+        <h2>Tus datos</h2>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-group">
+            <label>Nombre completo *</label>
+            <input type="text" formControlName="fullName" placeholder="Ej: Juan Pérez" />
+          </div>
+          <div class="form-group">
+            <label>Correo electrónico *</label>
+            <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono *</label>
+            <input type="tel" formControlName="phone" placeholder="999 888 777" />
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Fecha de entrada *</label>
+              <input type="date" formControlName="checkInDate" [min]="today" />
+            </div>
+            <div class="form-group">
+              <label>Fecha de salida *</label>
+              <input type="date" formControlName="checkOutDate" [min]="today" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Cantidad de personas *</label>
+            <input type="number" formControlName="numberOfPeople" min="1" [max]="room.capacity" />
+          </div>
+
+          <div class="booking-actions">
+            <a routerLink="/rooms" class="btn-secondary-pub">&#8592; Volver</a>
+            <button type="submit" class="btn-reservar" [disabled]="form.invalid || saving">
+              @if (saving) { Procesando... } @else { Confirmar Reserva }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

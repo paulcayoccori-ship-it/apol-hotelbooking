@@ -21,4 +21,10 @@ public class RoomResponse {
     private BigDecimal pricePerNight;
     private Integer capacity;
     private RoomStatus status;
+    private String imageUrl;
+    private Boolean promotionActive;
+    private String promotionTitle;
+    private String promotionDescription;
+    private BigDecimal discountPercent;
+    private BigDecimal promotionPrice;
 }

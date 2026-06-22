@@ -14,6 +14,10 @@ export class RoomService {
     return this.http.get<Room[]>(this.url);
   }
 
+  getById(id: number): Observable<Room> {
+    return this.http.get<Room>(`${this.url}/${id}`);
+  }
+
   getAvailable(): Observable<Room[]> {
     return this.http.get<Room[]>(`${this.url}/available`);
   }

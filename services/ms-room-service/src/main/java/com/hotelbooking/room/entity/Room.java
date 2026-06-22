@@ -37,4 +37,22 @@ public class Room {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private RoomStatus status;
+
+    @Column(name = "image_url", columnDefinition = "LONGTEXT")
+    private String imageUrl;
+
+    @Column(name = "promotion_active")
+    private Boolean promotionActive = false;
+
+    @Column(name = "promotion_title", length = 100)
+    private String promotionTitle;
+
+    @Column(name = "promotion_description", columnDefinition = "TEXT")
+    private String promotionDescription;
+
+    @Column(name = "discount_percent", precision = 5, scale = 2)
+    private BigDecimal discountPercent;
+
+    @Column(name = "promotion_price", precision = 10, scale = 2)
+    private BigDecimal promotionPrice;
 }
