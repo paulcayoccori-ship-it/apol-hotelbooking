@@ -1,0 +1,76 @@
+site_name: HotelBooking — Sistemas Distribuidos
+site_description: Plataforma distribuida de gestión de reservas hoteleras con arquitectura de microservicios
+site_author: Paul Cayoccori
+site_url: https://paulcayoccori-ship-it.github.io/apol-hotelbooking/
+repo_name: paulcayoccori-ship-it/apol-hotelbooking
+repo_url: https://github.com/paulcayoccori-ship-it/apol-hotelbooking
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+
+nav:
+  - Inicio: index.md
+  - Producto del curso: producto.md
+  - Contenido del curso: contenido.md
+  - Arquitectura: arquitectura.md
+  - Desarrollo DEV: desarrollo-dev.md
+  - Seguridad Keycloak: seguridad-keycloak.md
+  - Observabilidad: observabilidad.md
+  - Dominio de negocio: dominio-negocio.md
+  - Puertos: puertos.md
+  - Flujo de trabajo: flujo-trabajo.md
+  - Evaluación: evaluacion.md
+  - Laboratorios: laboratorios.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - def_list
+
+plugins:
+  - search:
+      lang: es
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/paulcayoccori-ship-it/apol-hotelbooking
