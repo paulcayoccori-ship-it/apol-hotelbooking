@@ -37,7 +37,7 @@
               <span>&#128100; {{ r.capacity }} personas</span>
               <span class="room-price">S/ {{ r.pricePerNight | number:'1.2-2' }} / noche</span>
             </div>
-            <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar</a>
+            <button (click)="reservar(r.id!)" class="btn-reservar">Reservar</button>
           </div>
         </div>
       }
@@ -68,7 +68,7 @@
               <span class="price-old">S/ {{ r.pricePerNight | number:'1.2-2' }}</span>
               <span class="price-new">S/ {{ r.promotionPrice | number:'1.2-2' }}</span>
             </div>
-            <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar ahora</a>
+            <button (click)="reservar(r.id!)" class="btn-reservar">Reservar ahora</button>
           </div>
         </div>
       }

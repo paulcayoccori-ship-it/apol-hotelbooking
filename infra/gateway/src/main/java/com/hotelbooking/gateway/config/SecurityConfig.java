@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         // Preflight OPTIONS — siempre libre
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Endpoints públicos
+                        // Endpoints públicos de infraestructura
                         .pathMatchers(
                                 "/actuator/health",
                                 "/actuator/info",
@@ -28,7 +28,17 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        // API de negocio — requieren JWT válido de Keycloak
+
+                        // ── Público — cliente final, sin login (web pública) ────────
+                        .pathMatchers(HttpMethod.GET,   "/api/v1/rooms/**").permitAll()
+                        .pathMatchers(HttpMethod.POST,  "/api/v1/users/client/register").permitAll()
+                        .pathMatchers(HttpMethod.POST,  "/api/v1/users/client/login").permitAll()
+                        .pathMatchers(HttpMethod.POST,  "/api/v1/bookings").permitAll()
+                        .pathMatchers(HttpMethod.GET,   "/api/v1/bookings/*").permitAll()
+                        .pathMatchers(HttpMethod.POST,  "/api/v1/payments").permitAll()
+                        .pathMatchers(HttpMethod.PATCH, "/api/v1/payments/*/confirm").permitAll()
+
+                        // ── Resto de la API — panel admin, requiere JWT de Keycloak ──
                         .pathMatchers("/api/v1/**").authenticated()
                         .anyExchange().authenticated()
                 )

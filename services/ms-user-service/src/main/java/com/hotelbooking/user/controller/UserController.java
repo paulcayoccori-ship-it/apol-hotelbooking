@@ -1,5 +1,8 @@
 package com.hotelbooking.user.controller;
 
+import com.hotelbooking.user.dto.ClientLoginRequest;
+import com.hotelbooking.user.dto.ClientRegisterRequest;
+import com.hotelbooking.user.dto.ClientResponse;
 import com.hotelbooking.user.dto.UserRequest;
 import com.hotelbooking.user.dto.UserResponse;
 import com.hotelbooking.user.service.UserService;
@@ -86,6 +89,23 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ── Client auth (público, sin Keycloak) ───────────────────────────────
+
+    @PostMapping("/client/register")
+    @Operation(summary = "Register a new client (public endpoint)")
+    public ResponseEntity<ClientResponse> clientRegister(
+            @Valid @RequestBody ClientRegisterRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.registerClient(request));
+    }
+
+    @PostMapping("/client/login")
+    @Operation(summary = "Client login by document number (public endpoint)")
+    public ResponseEntity<ClientResponse> clientLogin(
+            @Valid @RequestBody ClientLoginRequest request) {
+        return ResponseEntity.ok(userService.loginClient(request));
     }
 
     // ── GET instancia ──────────────────────────────────────────────────────

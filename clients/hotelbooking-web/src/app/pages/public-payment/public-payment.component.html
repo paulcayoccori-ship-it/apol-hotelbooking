@@ -1,101 +1,316 @@
-<div class="pub-page booking-page">
-  <div class="pub-page-header">
-    <h1>Confirmar Pago</h1>
-  </div>
+<div class="pay-page">
 
-  @if (error)   { <div class="alert-pub">{{ error }}</div> }
-  @if (loading) { <div class="loading-pub">Cargando reserva...</div> }
-
-  <!-- Pantalla de éxito -->
-  @if (done && payment) {
-    <div class="success-card">
-      <div class="success-icon">&#10003;</div>
-      <h2>¡Reserva pagada correctamente!</h2>
-      <div class="summary-table">
-        <div class="summary-row">
-          <span>N° Reserva</span>
-          <strong>#{{ booking?.id }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Check-in</span>
-          <strong>{{ booking?.checkInDate }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Check-out</span>
-          <strong>{{ booking?.checkOutDate }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Monto pagado</span>
-          <strong>S/ {{ payment.amount | number:'1.2-2' }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Método de pago</span>
-          <strong>{{ payment.paymentMethod }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Estado</span>
-          <strong class="text-success">{{ payment.status }}</strong>
-        </div>
-      </div>
-      <a routerLink="/" class="btn-reservar">Volver al inicio</a>
+  <!-- ── CARGANDO ────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="pay-loading">
+      <div class="pay-spinner"></div>
+      <p>Cargando reserva...</p>
     </div>
   }
 
-  <!-- Formulario de pago -->
-  @if (!done && booking && !loading) {
-    <div class="booking-layout">
-      <div class="booking-summary-card">
-        <h3>Resumen de Reserva</h3>
-        <div class="summary-table">
+  @if (error && !loading) {
+    <div class="pay-error">
+      <p>{{ error }}</p>
+      <a routerLink="/rooms" class="btn-pay-secondary">&#8592; Volver a habitaciones</a>
+    </div>
+  }
+
+  <!-- ── ÉXITO ─────────────────────────────────────────────────── -->
+  @if (done && payment) {
+    <div class="pay-success-wrap">
+      <div class="pay-success-card">
+        <div class="success-circle">&#10003;</div>
+        <h2>¡Pago confirmado!</h2>
+        <p class="success-subtitle">Tu reserva está garantizada</p>
+        <div class="success-details">
+          <div class="success-row"><span>N° Reserva</span><strong>#{{ booking?.id }}</strong></div>
+          <div class="success-row"><span>Habitación</span><strong>Hab. {{ room?.roomNumber ?? booking?.roomId }}</strong></div>
+          <div class="success-row"><span>Check-in</span><strong>{{ formatDate(booking?.checkInDate ?? '') }}</strong></div>
+          <div class="success-row"><span>Check-out</span><strong>{{ formatDate(booking?.checkOutDate ?? '') }}</strong></div>
+          <div class="success-row"><span>Monto pagado</span><strong class="amount-highlight">S/ {{ payment.amount | number:'1.2-2' }}</strong></div>
+          <div class="success-row"><span>Método</span><strong>{{ payment.paymentMethod }}</strong></div>
+          <div class="success-row"><span>Estado</span><strong class="status-ok">CONFIRMADO</strong></div>
+        </div>
+        <a routerLink="/" class="btn-pay-primary">Volver al inicio</a>
+      </div>
+    </div>
+  }
+
+  <!-- ── FORMULARIO DE PAGO ──────────────────────────────────── -->
+  @if (!done && !loading && booking) {
+    <div class="pay-container">
+
+      <!-- COLUMNA IZQUIERDA: resumen -->
+      <aside class="pay-summary">
+        <div class="summary-header">
+          <span class="summary-icon">&#128197;</span>
+          <h3>Resumen de Reserva</h3>
+        </div>
+
+        <div class="summary-rows">
           <div class="summary-row">
             <span>N° Reserva</span>
             <strong>#{{ booking.id }}</strong>
           </div>
           <div class="summary-row">
+            <span>Habitación</span>
+            <strong>
+              Hab. {{ room?.roomNumber ?? booking.roomId }}
+              @if (room?.type) { <span class="room-type-tag">{{ room!.type }}</span> }
+            </strong>
+          </div>
+          <div class="summary-row">
             <span>Check-in</span>
-            <strong>{{ booking.checkInDate }}</strong>
+            <strong>{{ formatDate(booking.checkInDate) }}</strong>
           </div>
           <div class="summary-row">
             <span>Check-out</span>
-            <strong>{{ booking.checkOutDate }}</strong>
+            <strong>{{ formatDate(booking.checkOutDate) }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Noches</span>
+            <strong>{{ nights }}</strong>
           </div>
           <div class="summary-row total-row">
             <span>Total a pagar</span>
             <strong>S/ {{ booking.totalAmount | number:'1.2-2' }}</strong>
           </div>
         </div>
-      </div>
 
-      <div class="booking-form-card">
-        <h2>Datos de Pago</h2>
-        <form [formGroup]="form" (ngSubmit)="pay()">
-          <div class="form-group">
-            <label>Método de pago *</label>
-            <div class="method-grid">
-              @for (m of methods; track m) {
-                <label class="method-option" [class.selected]="form.value.paymentMethod === m">
-                  <input type="radio" formControlName="paymentMethod" [value]="m" />
-                  {{ m }}
+        @if (room?.imageUrl) {
+          <img [src]="room!.imageUrl" alt="Habitación" class="summary-room-img" />
+        }
+
+        <div class="summary-secure">
+          <span>&#128274;</span> Tus datos están protegidos con seguridad SSL
+        </div>
+        <p class="summary-sandbox">Este es un entorno de pruebas. El pago es simulado.</p>
+      </aside>
+
+      <!-- COLUMNA DERECHA: pago -->
+      <main class="pay-form">
+        <h2 class="pay-form-title">Método de pago</h2>
+
+        <!-- Tabs de métodos -->
+        <div class="method-tabs">
+          <button class="method-tab" [class.active]="selectedMethod==='CARD'"     (click)="select('CARD')">
+            <span class="tab-icon">&#128179;</span> Tarjeta
+          </button>
+          <button class="method-tab method-yape" [class.active]="selectedMethod==='YAPE'"  (click)="select('YAPE')">
+            <span class="tab-icon yape-dot">&#9679;</span> Yape
+          </button>
+          <button class="method-tab method-plin" [class.active]="selectedMethod==='PLIN'"  (click)="select('PLIN')">
+            <span class="tab-icon">&#9679;</span> Plin
+          </button>
+          <button class="method-tab" [class.active]="selectedMethod==='TRANSFER'" (click)="select('TRANSFER')">
+            <span class="tab-icon">&#127981;</span> Trans.
+          </button>
+          <button class="method-tab method-cash" [class.active]="selectedMethod==='CASH'"  (click)="select('CASH')">
+            <span class="tab-icon">&#128181;</span> Efectivo
+          </button>
+        </div>
+
+        <!-- Mensaje de simulación -->
+        @if (simMessage) {
+          <div class="sim-success-msg" [class.show]="simSuccess">{{ simMessage }}</div>
+        }
+
+        <!-- ── TARJETA ────────────────────────────────── -->
+        @if (selectedMethod === 'CARD') {
+          <div class="card-section">
+            <!-- Tarjeta visual -->
+            <div class="credit-card">
+              <div class="cc-top">
+                <span class="cc-brand">HotelBooking</span>
+                <span class="cc-chip">&#9632;</span>
+              </div>
+              <div class="cc-number">{{ cardDisplay }}</div>
+              <div class="cc-bottom">
+                <div>
+                  <div class="cc-label">Titular</div>
+                  <div class="cc-value">{{ holderDisplay }}</div>
+                </div>
+                <div>
+                  <div class="cc-label">Vence</div>
+                  <div class="cc-value">{{ expiryDisplay }}</div>
+                </div>
+                <div class="cc-logo-text">VISA</div>
+              </div>
+            </div>
+
+            <!-- Formulario tarjeta -->
+            <form [formGroup]="cardForm" (ngSubmit)="pay()" class="pay-form-fields">
+              <div class="form-field">
+                <label>Número de tarjeta *</label>
+                <input formControlName="cardNumber" placeholder="1234 5678 9012 3456"
+                       maxlength="16" inputmode="numeric" (input)="refresh()" />
+                @if (cardForm.get('cardNumber')?.invalid && cardForm.get('cardNumber')?.touched) {
+                  <span class="field-error">16 dígitos requeridos</span>
+                }
+              </div>
+              <div class="form-field">
+                <label>Nombre del titular *</label>
+                <input formControlName="cardHolder" placeholder="Como aparece en la tarjeta"
+                       (input)="refresh()" style="text-transform:uppercase" />
+                @if (cardForm.get('cardHolder')?.invalid && cardForm.get('cardHolder')?.touched) {
+                  <span class="field-error">Nombre requerido</span>
+                }
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label>Vencimiento *</label>
+                  <input formControlName="expiry" placeholder="MM/AA" maxlength="5"
+                         (input)="refresh()" />
+                  @if (cardForm.get('expiry')?.invalid && cardForm.get('expiry')?.touched) {
+                    <span class="field-error">Formato MM/AA</span>
+                  }
+                </div>
+                <div class="form-field">
+                  <label>CVV *</label>
+                  <input formControlName="cvv" placeholder="123" maxlength="3"
+                         inputmode="numeric" type="password" />
+                  @if (cardForm.get('cvv')?.invalid && cardForm.get('cvv')?.touched) {
+                    <span class="field-error">3 dígitos</span>
+                  }
+                </div>
+              </div>
+              <p class="test-hint">
+                &#8505; Tarjetas de prueba — VISA: <code>4242 4242 4242 4242</code> · CVV: <code>123</code>
+              </p>
+              <div class="pay-actions">
+                <a routerLink="/rooms" class="btn-pay-secondary">&#8592; Cancelar</a>
+                <button type="submit" class="btn-pay-primary" [disabled]="saving">
+                  @if (saving) { <span class="btn-spinner"></span> Procesando... }
+                  @else { &#128179; Pagar con tarjeta S/ {{ booking!.totalAmount | number:'1.2-2' }} }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- ── YAPE ────────────────────────────────────── -->
+        @if (selectedMethod === 'YAPE') {
+          <div class="yape-section">
+            <div class="yape-header">
+              <span class="yape-brand">Paga con Yape</span>
+              <p>Escanea el código QR desde tu aplicación Yape y coloca el código de operación.</p>
+            </div>
+            <div class="yape-body">
+              <div class="qr-wrap">
+                @if (qrDataUrl) {
+                  <img [src]="qrDataUrl" alt="QR Yape" class="qr-img" />
+                } @else {
+                  <div class="qr-placeholder">&#8230;</div>
+                }
+              </div>
+              <div class="yape-info">
+                <div class="yape-detail"><span>&#128100; Receptor:</span><strong>HotelBooking</strong></div>
+                <div class="yape-detail"><span>&#128242; Celular:</span><strong>999 888 777</strong></div>
+                <div class="yape-detail yape-amount"><span>Monto:</span><strong class="big-amount">S/ {{ booking!.totalAmount | number:'1.2-2' }}</strong></div>
+              </div>
+            </div>
+
+            <form [formGroup]="codeForm" (ngSubmit)="pay()" class="pay-form-fields">
+              <div class="form-field">
+                <label>Código de operación *
+                  <a class="code-help" href="#">¿Dónde encuentro mi código?</a>
                 </label>
-              }
+                <input formControlName="operationCode" placeholder="Ej: YP-123456" />
+                @if (codeForm.get('operationCode')?.invalid && codeForm.get('operationCode')?.touched) {
+                  <span class="field-error">Código de operación requerido</span>
+                }
+              </div>
+              <p class="yape-notice">
+                &#8505; <strong>Importante:</strong> No olvides colocar tu código de operación para confirmar el pago.
+              </p>
+              <div class="pay-actions">
+                <a routerLink="/rooms" class="btn-pay-secondary">&#8592; Cancelar</a>
+                <button type="submit" class="btn-yape-primary" [disabled]="saving">
+                  @if (saving) { <span class="btn-spinner"></span> Procesando... }
+                  @else { &#10003; Confirmar pago Yape }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- ── PLIN ────────────────────────────────────── -->
+        @if (selectedMethod === 'PLIN') {
+          <div class="plin-section">
+            <div class="plin-header">
+              <span class="plin-brand">Paga con Plin</span>
+            </div>
+            <div class="plin-info">
+              <div class="info-row"><span>&#128242; Celular Plin:</span><strong>999 888 777</strong></div>
+              <div class="info-row amount-row"><span>Monto:</span><strong>S/ {{ booking!.totalAmount | number:'1.2-2' }}</strong></div>
+            </div>
+            <form [formGroup]="codeForm" (ngSubmit)="pay()" class="pay-form-fields">
+              <div class="form-field">
+                <label>Código de operación *</label>
+                <input formControlName="operationCode" placeholder="Ej: PL-123456" />
+                @if (codeForm.get('operationCode')?.invalid && codeForm.get('operationCode')?.touched) {
+                  <span class="field-error">Código de operación requerido</span>
+                }
+              </div>
+              <div class="pay-actions">
+                <a routerLink="/rooms" class="btn-pay-secondary">&#8592; Cancelar</a>
+                <button type="submit" class="btn-plin-primary" [disabled]="saving">
+                  @if (saving) { <span class="btn-spinner"></span> Procesando... }
+                  @else { Confirmar pago Plin }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- ── TRANSFERENCIA ──────────────────────────── -->
+        @if (selectedMethod === 'TRANSFER') {
+          <div class="transfer-section">
+            <h3 class="transfer-title">Datos de transferencia</h3>
+            <div class="transfer-info">
+              <div class="info-row"><span>Banco:</span><strong>BCP</strong></div>
+              <div class="info-row"><span>Cuenta:</span><strong>191-0000000-0-00</strong></div>
+              <div class="info-row"><span>CCI:</span><strong>002-191-000000000000-00</strong></div>
+              <div class="info-row amount-row"><span>Monto:</span><strong>S/ {{ booking!.totalAmount | number:'1.2-2' }}</strong></div>
+            </div>
+            <form [formGroup]="codeForm" (ngSubmit)="pay()" class="pay-form-fields">
+              <div class="form-field">
+                <label>Código de operación *</label>
+                <input formControlName="operationCode" placeholder="Ej: TRF-123456" />
+                @if (codeForm.get('operationCode')?.invalid && codeForm.get('operationCode')?.touched) {
+                  <span class="field-error">Código de operación requerido</span>
+                }
+              </div>
+              <div class="pay-actions">
+                <a routerLink="/rooms" class="btn-pay-secondary">&#8592; Cancelar</a>
+                <button type="submit" class="btn-pay-primary" [disabled]="saving">
+                  @if (saving) { <span class="btn-spinner"></span> Procesando... }
+                  @else { Confirmar transferencia }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- ── EFECTIVO ────────────────────────────────── -->
+        @if (selectedMethod === 'CASH') {
+          <div class="cash-section">
+            <div class="cash-icon">&#128181;</div>
+            <h3>Pago en recepción</h3>
+            <p>El pago será confirmado en recepción al momento del check-in.</p>
+            <p>Presenta el <strong>N° de reserva #{{ booking!.id }}</strong> al llegar.</p>
+            <div class="cash-total">Total a pagar: <strong>S/ {{ booking!.totalAmount | number:'1.2-2' }}</strong></div>
+            <div class="pay-actions">
+              <a routerLink="/rooms" class="btn-pay-secondary">&#8592; Cancelar</a>
+              <button type="button" class="btn-pay-primary" (click)="pay()" [disabled]="saving">
+                @if (saving) { <span class="btn-spinner"></span> Procesando... }
+                @else { Confirmar reserva (pago en recepción) }
+              </button>
             </div>
           </div>
-          <div class="form-group">
-            <label>Monto (S/) *</label>
-            <input type="number" formControlName="amount" min="1" step="0.01" />
-          </div>
-          <div class="form-group">
-            <label>Código de operación</label>
-            <input type="text" formControlName="transactionCode" placeholder="Ej: OP-123456 (opcional)" />
-          </div>
-          <div class="booking-actions">
-            <a routerLink="/rooms" class="btn-secondary-pub">&#8592; Cancelar</a>
-            <button type="submit" class="btn-reservar" [disabled]="form.invalid || saving">
-              @if (saving) { Procesando... } @else { Confirmar pago }
-            </button>
-          </div>
-        </form>
-      </div>
+        }
+
+      </main>
     </div>
   }
 </div>

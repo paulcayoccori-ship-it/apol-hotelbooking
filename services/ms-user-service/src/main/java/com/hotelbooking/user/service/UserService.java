@@ -1,5 +1,8 @@
 package com.hotelbooking.user.service;
 
+import com.hotelbooking.user.dto.ClientLoginRequest;
+import com.hotelbooking.user.dto.ClientRegisterRequest;
+import com.hotelbooking.user.dto.ClientResponse;
 import com.hotelbooking.user.dto.UserRequest;
 import com.hotelbooking.user.dto.UserResponse;
 
@@ -20,4 +23,8 @@ public interface UserService {
     void delete(Long id);
 
     boolean existsById(Long id);
+
+    ClientResponse registerClient(ClientRegisterRequest request);
+
+    ClientResponse loginClient(ClientLoginRequest request);
 }

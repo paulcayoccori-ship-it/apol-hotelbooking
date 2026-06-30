@@ -1,5 +1,6 @@
 package com.hotelbooking.user.entity;
 
+import com.hotelbooking.user.enums.DocumentType;
 import com.hotelbooking.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +21,7 @@ public class User {
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(nullable = true, unique = true, length = 150)
     private String email;
 
     @Column(length = 20)
@@ -35,4 +36,11 @@ public class User {
 
     @Column(nullable = false)
     private Boolean enabled;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "document_type", length = 30)
+    private DocumentType documentType;
+
+    @Column(name = "document_number", unique = true, length = 20)
+    private String documentNumber;
 }

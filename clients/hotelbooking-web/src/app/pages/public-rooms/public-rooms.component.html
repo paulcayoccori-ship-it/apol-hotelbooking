@@ -11,11 +11,6 @@
         @if (t) { <option [value]="t">{{ t }}</option> }
       }
     </select>
-    <select [(ngModel)]="filterStatus" (change)="applyFilters()">
-      <option value="">Todos los estados</option>
-      <option value="AVAILABLE">Disponibles</option>
-      <option value="OCCUPIED">Ocupadas</option>
-    </select>
   </div>
 
   @if (error)   { <div class="alert-pub">{{ error }}</div> }
@@ -38,9 +33,7 @@
           <p class="room-desc">{{ r.description || 'Habitación cómoda y bien equipada.' }}</p>
           <div class="room-meta">
             <span>&#128100; {{ r.capacity }} personas</span>
-            <span class="status-dot" [class.available]="r.status === 'AVAILABLE'">
-              {{ r.status === 'AVAILABLE' ? 'Disponible' : r.status }}
-            </span>
+            <span class="status-dot available">Disponible</span>
           </div>
           <div class="room-price-row">
             @if (r.promotionActive && r.promotionPrice) {
@@ -50,16 +43,12 @@
               <span class="room-price">S/ {{ r.pricePerNight | number:'1.2-2' }} / noche</span>
             }
           </div>
-          @if (r.status === 'AVAILABLE') {
-            <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar</a>
-          } @else {
-            <button class="btn-reservar disabled" disabled>No disponible</button>
-          }
+          <button (click)="reservar(r.id!)" class="btn-reservar">Reservar</button>
         </div>
       </div>
     }
     @if (!loading && filtered.length === 0) {
-      <p class="empty-pub">No se encontraron habitaciones con los filtros aplicados.</p>
+      <p class="empty-pub">No hay habitaciones disponibles en este momento.</p>
     }
   </div>
 </div>

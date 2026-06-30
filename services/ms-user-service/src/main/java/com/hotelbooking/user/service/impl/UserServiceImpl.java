@@ -1,9 +1,16 @@
 package com.hotelbooking.user.service.impl;
 
+import com.hotelbooking.user.dto.ClientLoginRequest;
+import com.hotelbooking.user.dto.ClientRegisterRequest;
+import com.hotelbooking.user.dto.ClientResponse;
 import com.hotelbooking.user.dto.UserRequest;
 import com.hotelbooking.user.dto.UserResponse;
 import com.hotelbooking.user.entity.User;
+import com.hotelbooking.user.enums.DocumentType;
+import com.hotelbooking.user.enums.UserRole;
+import com.hotelbooking.user.exception.DocumentAlreadyExistsException;
 import com.hotelbooking.user.exception.EmailAlreadyExistsException;
+import com.hotelbooking.user.exception.InvalidCredentialsException;
 import com.hotelbooking.user.exception.UserNotFoundException;
 import com.hotelbooking.user.repository.UserRepository;
 import com.hotelbooking.user.service.UserService;
@@ -66,9 +73,13 @@ public class UserServiceImpl implements UserService {
     public UserResponse update(Long id, UserRequest request) {
         User user = getOrThrow(id);
 
-        if (!user.getEmail().equalsIgnoreCase(request.getEmail())
-                && userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException(request.getEmail());
+        String currentEmail = user.getEmail();
+        String newEmail     = request.getEmail();
+        boolean emailChanged = (currentEmail == null)
+                || !currentEmail.equalsIgnoreCase(newEmail);
+
+        if (emailChanged && userRepository.existsByEmail(newEmail)) {
+            throw new EmailAlreadyExistsException(newEmail);
         }
 
         user.setFullName(request.getFullName());
@@ -98,6 +109,39 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsById(id);
     }
 
+    // ── Client auth ────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public ClientResponse registerClient(ClientRegisterRequest request) {
+        if (userRepository.existsByDocumentNumber(request.getDocumentNumber())) {
+            throw new DocumentAlreadyExistsException(request.getDocumentNumber());
+        }
+        User user = User.builder()
+                .fullName(request.getFullName())
+                .documentType(DocumentType.valueOf(request.getDocumentType()))
+                .documentNumber(request.getDocumentNumber())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(UserRole.CUSTOMER)
+                .enabled(Boolean.TRUE)
+                .build();
+        return toClientResponse(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ClientResponse loginClient(ClientLoginRequest request) {
+        User user = userRepository.findByDocumentNumber(request.getDocumentNumber())
+                .orElseThrow(InvalidCredentialsException::new);
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+        return toClientResponse(user);
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────
 
     private User getOrThrow(Long id) {
@@ -113,6 +157,18 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .role(user.getRole())
                 .enabled(user.getEnabled())
+                .build();
+    }
+
+    private ClientResponse toClientResponse(User user) {
+        return ClientResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .documentType(user.getDocumentType() != null ? user.getDocumentType().name() : null)
+                .documentNumber(user.getDocumentNumber())
+                .role(user.getRole().name())
+                .phone(user.getPhone())
+                .email(user.getEmail())
                 .build();
     }
 }

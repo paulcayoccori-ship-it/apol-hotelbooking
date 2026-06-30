@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { RoomService } from '../../core/services/room.service';
+import { ClientAuthService } from '../../core/services/client-auth.service';
 import { Room } from '../../core/models/room.model';
 
 @Component({
@@ -15,7 +17,12 @@ export class PublicPromotionsComponent implements OnInit {
   loading = false;
   error   = '';
 
-  constructor(private svc: RoomService) {}
+  constructor(
+    private svc: RoomService,
+    private clientAuth: ClientAuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
@@ -23,8 +30,22 @@ export class PublicPromotionsComponent implements OnInit {
       next: rooms => {
         this.promotions = rooms.filter(r => r.promotionActive);
         this.loading    = false;
+        this.cdr.detectChanges();
       },
-      error: () => { this.error = 'No se pudo cargar las promociones.'; this.loading = false; }
+      error: () => {
+        this.error   = 'No se pudo cargar las promociones.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
+  }
+
+  reservar(roomId: number): void {
+    if (this.clientAuth.isLoggedIn()) {
+      this.router.navigate(['/booking', roomId]);
+    } else {
+      this.clientAuth.savePendingBooking(roomId);
+      this.router.navigate(['/client-login']);
+    }
   }
 }

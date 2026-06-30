@@ -1,60 +1,101 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
-import { switchMap } from 'rxjs/operators';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { RoomService } from '../../core/services/room.service';
-import { UserService } from '../../core/services/user.service';
 import { BookingService } from '../../core/services/booking.service';
+import { ClientAuthService } from '../../core/services/client-auth.service';
+import { Client } from '../../core/models/client.model';
 import { Room } from '../../core/models/room.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-public-booking',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, DecimalPipe, RouterLink],
   templateUrl: './public-booking.component.html'
 })
 export class PublicBookingComponent implements OnInit {
-  room: Room | null = null;
-  loading  = false;
-  saving   = false;
-  error    = '';
-  success  = '';
+  room:   Room | null   = null;
+  client: Client | null = null;
+  loading = false;
+  saving  = false;
+  error   = '';
 
   form = new FormGroup({
-    fullName:   new FormControl('', Validators.required),
-    email:      new FormControl('', [Validators.required, Validators.email]),
-    phone:      new FormControl('', Validators.required),
-    checkInDate:  new FormControl('', Validators.required),
-    checkOutDate: new FormControl('', Validators.required),
+    checkInDate:    new FormControl('', Validators.required),
+    checkOutDate:   new FormControl('', Validators.required),
     numberOfPeople: new FormControl<number>(1, [Validators.required, Validators.min(1)])
   });
 
   today = new Date().toISOString().split('T')[0];
 
   constructor(
-    private route:   ActivatedRoute,
-    private router:  Router,
-    private roomSvc: RoomService,
-    private userSvc: UserService,
-    private bookSvc: BookingService
+    private route:      ActivatedRoute,
+    private router:     Router,
+    private roomSvc:    RoomService,
+    private bookSvc:    BookingService,
+    private clientAuth: ClientAuthService,
+    private cdr:        ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('roomId'));
+    this.client = this.clientAuth.getClient();
+
+    const idParam = this.route.snapshot.paramMap.get('roomId');
+    console.log('[PublicBooking] ID recibido desde ruta:', idParam);
+
+    if (!idParam) {
+      this.loading = false;
+      this.error = 'No se recibió el ID de la habitación.';
+      return;
+    }
+
+    const roomId = Number(idParam);
+    if (isNaN(roomId) || roomId <= 0) {
+      this.loading = false;
+      this.error = 'ID de habitación inválido.';
+      return;
+    }
+
+    console.log('[PublicBooking] URL consultada:', `${environment.apiUrl}/api/v1/rooms/${roomId}`);
     this.loading = true;
-    this.roomSvc.getById(id).subscribe({
-      next: r  => { this.room = r; this.loading = false; },
-      error: () => { this.error = 'Habitación no encontrada.'; this.loading = false; }
+    this.roomSvc.getById(roomId).subscribe({
+      next: r => {
+        console.log('[PublicBooking] Habitación cargada:', r);
+        this.room    = r;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('[PublicBooking] Error al cargar habitación:', err);
+        this.error   = 'No se pudo cargar la habitación seleccionada.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
+  goLogin(): void {
+    if (this.room) {
+      this.clientAuth.savePendingBooking(this.room.id!);
+    }
+    this.router.navigate(['/client-login']);
+  }
+
+  goRegister(): void {
+    if (this.room) {
+      this.clientAuth.savePendingBooking(this.room.id!);
+    }
+    this.router.navigate(['/client-register']);
+  }
+
   submit(): void {
-    if (this.form.invalid || !this.room) return;
+    if (this.form.invalid || !this.room || !this.client) return;
     this.saving = true;
     this.error  = '';
 
-    const { fullName, email, phone, checkInDate, checkOutDate } = this.form.value;
+    const { checkInDate, checkOutDate } = this.form.value;
 
     const nights = this.calcNights(checkInDate!, checkOutDate!);
     const price  = this.room.promotionActive && this.room.promotionPrice
@@ -62,29 +103,21 @@ export class PublicBookingComponent implements OnInit {
       : this.room.pricePerNight;
     const total  = price * nights;
 
-    this.userSvc.create({
-      fullName: fullName!,
-      email:    email!,
-      phone:    phone!,
-      role:     'CUSTOMER',
-      enabled:  true
-    }).pipe(
-      switchMap(user => this.bookSvc.create({
-        userId:       user.id!,
-        roomId:       this.room!.id!,
-        checkInDate:  checkInDate!,
-        checkOutDate: checkOutDate!,
-        totalAmount:  total,
-        status:       'PENDING'
-      }))
-    ).subscribe({
+    this.bookSvc.create({
+      userId:       this.client.id,
+      roomId:       this.room.id!,
+      checkInDate:  checkInDate!,
+      checkOutDate: checkOutDate!,
+      totalAmount:  total,
+      status:       'PENDING'
+    }).subscribe({
       next: booking => {
         this.saving = false;
         this.router.navigate(['/payment', booking.id]);
       },
       error: () => {
         this.saving = false;
-        this.error  = 'No se pudo completar la reserva. Verifique que el Gateway esté activo en http://localhost:7091';
+        this.error  = 'No se pudo completar la reserva. Intenta nuevamente.';
       }
     });
   }

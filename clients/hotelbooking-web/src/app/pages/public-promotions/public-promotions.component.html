@@ -41,7 +41,7 @@
           <p class="promo-saving">
             Ahorras S/ {{ (r.pricePerNight - (r.promotionPrice ?? 0)) | number:'1.2-2' }} por noche
           </p>
-          <a [routerLink]="['/booking', r.id]" class="btn-reservar">Reservar ahora</a>
+          <button (click)="reservar(r.id!)" class="btn-reservar">Reservar ahora</button>
         </div>
       </div>
     }

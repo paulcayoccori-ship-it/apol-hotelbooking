@@ -13,10 +13,12 @@ export const routes: Routes = [
       { path: 'promotions', loadComponent: () => import('./pages/public-promotions/public-promotions.component').then(m => m.PublicPromotionsComponent) },
       { path: 'booking/:roomId',    loadComponent: () => import('./pages/public-booking/public-booking.component').then(m => m.PublicBookingComponent) },
       { path: 'payment/:bookingId', loadComponent: () => import('./pages/public-payment/public-payment.component').then(m => m.PublicPaymentComponent) },
+      { path: 'client-login',      loadComponent: () => import('./pages/client-login/client-login.component').then(m => m.ClientLoginComponent) },
+      { path: 'client-register',   loadComponent: () => import('./pages/client-register/client-register.component').then(m => m.ClientRegisterComponent) },
     ]
   },
 
-  // ── Login ──────────────────────────────────────────────────────────────
+  // ── Login admin (Keycloak) ───────────────────────────────────────────────
   {
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)

@@ -3,7 +3,13 @@
     <h1>Reservar Habitación</h1>
   </div>
 
-  @if (error)   { <div class="alert-pub">{{ error }}</div> }
+  @if (error) {
+    <div class="alert-pub">
+      {{ error }}
+      <br />
+      <a routerLink="/rooms" class="btn-secondary-pub" style="display:inline-block;margin-top:12px;">&#8592; Volver a habitaciones</a>
+    </div>
+  }
   @if (loading) { <div class="loading-pub">Cargando habitación...</div> }
 
   @if (room && !loading) {
@@ -37,44 +43,49 @@
         </div>
       </div>
 
-      <!-- Formulario reserva -->
+      <!-- Panel derecho -->
       <div class="booking-form-card">
-        <h2>Tus datos</h2>
-        <form [formGroup]="form" (ngSubmit)="submit()">
-          <div class="form-group">
-            <label>Nombre completo *</label>
-            <input type="text" formControlName="fullName" placeholder="Ej: Juan Pérez" />
-          </div>
-          <div class="form-group">
-            <label>Correo electrónico *</label>
-            <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
-          </div>
-          <div class="form-group">
-            <label>Teléfono *</label>
-            <input type="tel" formControlName="phone" placeholder="999 888 777" />
-          </div>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label>Fecha de entrada *</label>
-              <input type="date" formControlName="checkInDate" [min]="today" />
-            </div>
-            <div class="form-group">
-              <label>Fecha de salida *</label>
-              <input type="date" formControlName="checkOutDate" [min]="today" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Cantidad de personas *</label>
-            <input type="number" formControlName="numberOfPeople" min="1" [max]="room.capacity" />
-          </div>
 
-          <div class="booking-actions">
-            <a routerLink="/rooms" class="btn-secondary-pub">&#8592; Volver</a>
-            <button type="submit" class="btn-reservar" [disabled]="form.invalid || saving">
-              @if (saving) { Procesando... } @else { Confirmar Reserva }
-            </button>
+        @if (!client) {
+          <!-- Sin sesión: mostrar mensaje + botones -->
+          <div class="no-session-msg">
+            <p class="text-lg font-semibold mb-2">&#128274; Para reservar debes iniciar sesión o registrarte</p>
+            <p class="text-sm text-gray-500 mb-6">Es rápido y gratuito. Solo necesitas tu DNI o Carnet.</p>
+            <div class="flex gap-4">
+              <button (click)="goLogin()" class="btn-reservar">Iniciar sesión</button>
+              <button (click)="goRegister()" class="btn-secondary-pub">Registrarme</button>
+            </div>
           </div>
-        </form>
+        } @else {
+          <!-- Con sesión: formulario de reserva -->
+          <h2>Hola, {{ client.fullName }}</h2>
+          <p class="text-sm text-gray-500 mb-4">Completa los datos para confirmar tu reserva.</p>
+
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label>Fecha de entrada *</label>
+                <input type="date" formControlName="checkInDate" [min]="today" />
+              </div>
+              <div class="form-group">
+                <label>Fecha de salida *</label>
+                <input type="date" formControlName="checkOutDate" [min]="today" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Cantidad de personas *</label>
+              <input type="number" formControlName="numberOfPeople" min="1" [max]="room.capacity" />
+            </div>
+
+            <div class="booking-actions">
+              <a routerLink="/rooms" class="btn-secondary-pub">&#8592; Volver</a>
+              <button type="submit" class="btn-reservar" [disabled]="form.invalid || saving">
+                @if (saving) { Procesando... } @else { Confirmar Reserva }
+              </button>
+            </div>
+          </form>
+        }
+
       </div>
     </div>
   }
